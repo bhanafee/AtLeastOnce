@@ -13,7 +13,7 @@ import java.time.Duration;
 public class Resilience4jConfig {
 
     /**
-     * Circuit breaker for the downstream order-processing service.
+     * Circuit breaker for downstream language preference processing.
      * Opens after 50 % failures in a 10-call sliding window,
      * waits 30 s before allowing a single probe call through.
      */

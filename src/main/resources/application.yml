@@ -21,7 +21,7 @@ management:
 resilience4j:
   circuitbreaker:
     instances:
-      orderProducer:
+      languagePreferenceProducer:
         failure-rate-threshold: 50
         slow-call-rate-threshold: 80
         slow-call-duration-threshold: 2s
@@ -29,19 +29,19 @@ resilience4j:
         sliding-window-type: COUNT_BASED
         sliding-window-size: 10
         permitted-number-of-calls-in-half-open-state: 3
-      orderConsumer:
+      languagePreferenceConsumer:
         failure-rate-threshold: 50
         wait-duration-in-open-state: 30s
         sliding-window-size: 10
 
   retry:
     instances:
-      orderProducer:
+      languagePreferenceProducer:
         max-attempts: 3
         wait-duration: 1s
         retry-exceptions:
           - java.lang.Exception
-      orderConsumer:
+      languagePreferenceConsumer:
         max-attempts: 3
         wait-duration: 1s
         retry-exceptions:

@@ -1,6 +1,6 @@
 package com.example.atleastonce.consumer;
 
-import com.example.atleastonce.model.OrderEvent;
+import com.example.atleastonce.model.LanguagePreference;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -11,39 +11,39 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderEventConsumer {
+public class LanguagePreferenceConsumer {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderEventConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(LanguagePreferenceConsumer.class);
 
     /**
-     * Consumes order events with manual acknowledgment.
+     * Consumes language preference events with manual acknowledgment.
      * The offset is committed only after process() succeeds, guaranteeing
      * at-least-once delivery. Resilience4j retries wrap the downstream call.
      */
     @KafkaListener(
-            topics = "order-events",
+            topics = "language-preferences",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "kafkaListenerContainerFactory"
     )
-    public void onMessage(ConsumerRecord<String, OrderEvent> record, Acknowledgment ack) {
-        OrderEvent event = record.value();
-        log.info("Received event: orderId={} partition={} offset={}",
-                event.orderId(), record.partition(), record.offset());
+    public void onMessage(ConsumerRecord<String, LanguagePreference> record, Acknowledgment ack) {
+        LanguagePreference event = record.value();
+        log.info("Received event: customerId={} partition={} offset={}",
+                event.customerId(), record.partition(), record.offset());
         try {
             process(event);
             ack.acknowledge();  // commit offset only on success
         } catch (Exception ex) {
-            log.error("Processing failed — will be retried by error handler: orderId={}", event.orderId(), ex);
+            log.error("Processing failed — will be retried by error handler: customerId={}", event.customerId(), ex);
             // Do NOT ack; DefaultErrorHandler in KafkaConfig will retry then route to DLT
             throw ex;
         }
     }
 
-    @Retry(name = "orderConsumer")
-    @CircuitBreaker(name = "orderConsumer")
-    public void process(OrderEvent event) {
+    @Retry(name = "languagePreferenceConsumer")
+    @CircuitBreaker(name = "languagePreferenceConsumer")
+    public void process(LanguagePreference event) {
         // TODO: replace with real downstream call (DB write, HTTP call, etc.)
-        log.info("Processing order: orderId={} status={} amount={}",
-                event.orderId(), event.status(), event.amount());
+        log.info("Processing language preference: customerId={} locale={}",
+                event.customerId(), event.preferredLanguage());
     }
 }

@@ -1,6 +1,6 @@
 package com.example.atleastonce.config;
 
-import com.example.atleastonce.model.OrderEvent;
+import com.example.atleastonce.model.LanguagePreference;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -31,7 +31,7 @@ public class KafkaConfig {
     // ── Producer ────────────────────────────────────────────────────────────
 
     @Bean
-    public ProducerFactory<String, OrderEvent> producerFactory() {
+    public ProducerFactory<String, LanguagePreference> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -45,14 +45,14 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, OrderEvent> kafkaTemplate() {
+    public KafkaTemplate<String, LanguagePreference> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
     // ── Consumer ────────────────────────────────────────────────────────────
 
     @Bean
-    public ConsumerFactory<String, OrderEvent> consumerFactory() {
+    public ConsumerFactory<String, LanguagePreference> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -66,8 +66,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, OrderEvent> kafkaListenerContainerFactory() {
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, OrderEvent>();
+    public ConcurrentKafkaListenerContainerFactory<String, LanguagePreference> kafkaListenerContainerFactory() {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, LanguagePreference>();
         factory.setConsumerFactory(consumerFactory());
         // Manual acknowledgment — commit only after successful processing
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
