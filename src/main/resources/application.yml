@@ -1,0 +1,48 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: at-least-once-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,circuitbreakers,retries
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      orderProducer:
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 80
+        slow-call-duration-threshold: 2s
+        wait-duration-in-open-state: 30s
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 3
+      orderConsumer:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        sliding-window-size: 10
+
+  retry:
+    instances:
+      orderProducer:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - java.lang.Exception
+      orderConsumer:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - java.lang.Exception

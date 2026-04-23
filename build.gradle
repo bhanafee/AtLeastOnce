@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dep.mgmt)
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation libs.spring.boot.web
+    implementation libs.spring.boot.actuator
+    implementation libs.spring.boot.aop
+    implementation libs.spring.kafka
+    implementation libs.resilience4j.spring.boot
+    implementation libs.micrometer.prometheus
+
+    testImplementation libs.spring.boot.test
+    testImplementation libs.spring.kafka.test
+    testImplementation libs.resilience4j.test
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
