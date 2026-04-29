@@ -28,6 +28,12 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.group-id}")
     private String groupId;
 
+    @Value("${spring.kafka.consumer.retry.interval-ms}")
+    private long retryIntervalMs;
+
+    @Value("${spring.kafka.consumer.retry.max-attempts}")
+    private long retryMaxAttempts;
+
     // ── Producer ────────────────────────────────────────────────────────────
 
     @Bean
@@ -71,8 +77,7 @@ public class KafkaConfig {
         factory.setConsumerFactory(consumerFactory());
         // Manual acknowledgment — commit only after successful processing
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-        // Retry twice with a 1 s gap before sending to the dead-letter topic
-        factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(1_000L, 2)));
+        factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(retryIntervalMs, retryMaxAttempts)));
         return factory;
     }
 }

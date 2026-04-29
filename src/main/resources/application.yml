@@ -5,6 +5,9 @@ spring:
       group-id: at-least-once-group
       auto-offset-reset: earliest
       enable-auto-commit: false
+      retry:
+        interval-ms: 1000
+        max-attempts: 2
 
 management:
   endpoints:
