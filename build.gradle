@@ -15,6 +15,9 @@ plugins {
 group = 'com.maybeitssquid'
 version = '0.0.1-SNAPSHOT'
 
+// Override BOM-managed Tomcat version to satisfy CVE-2026-43512 and related advisories
+ext['tomcat.version'] = libs.versions.tomcat.get()
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(libs.versions.java.get())
