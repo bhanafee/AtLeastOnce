@@ -214,3 +214,14 @@ Both instances: 3 attempts, 1 s fixed wait, retries on any `Exception`.
 `FixedBackOff(1 s, 2 attempts)` — up to 2 delivery retries before the message is routed to the
 dead-letter topic. This operates at the Kafka listener container layer, independently of the
 Resilience4j retry inside `process()`.
+
+## Technologies
+
+| Component | Version |
+|-----------|---------|
+| Java | 25 (toolchain; runs on 17+) |
+| Gradle | 9.5.1 |
+| Spring Boot | 4.0.6 |
+| Resilience4j | 2.4.0 |
+| Spring Kafka | (via Spring Boot) |
+| Micrometer/Prometheus | (via Spring Boot) |
