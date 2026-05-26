@@ -24,6 +24,10 @@ java {
     }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.release = libs.versions.release.get().toInteger()
+}
+
 repositories {
     mavenCentral()
 }
