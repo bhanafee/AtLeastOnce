@@ -30,10 +30,12 @@ What you can do instead is use retries as needed to ensure at least once deliver
 can happen when the sender retries while the receiver is down, or when the receiver is slow to process
 messages. Kafka implements a limited exactly-once guarantee by doing just that:
 
-* At-least-once is achieved by requiring `acks=all`. That setting ensures each message has been persisted by all
-  in-sync replicas in the cluster before the broker acknowledges receipt.
-* At-most-once is achieved by setting `enable.idempotence=true`. That setting causes Kafka to assign a unique
-  key to each message, consisting of the producer ID and a sequence number.
+* At-least-once comes from retrying until the broker acknowledges. `acks=all` makes that acknowledgement
+  durable: each message is persisted by all in-sync replicas before the broker acks, so an acked message
+  survives a broker failure.
+* The at-most-once half, suppressing duplicates from those retries, comes from `enable.idempotence=true`,
+  which has Kafka assign a unique key (producer ID + sequence number) to each message so the broker can drop a
+  replayed one.
 
 Both `acks=all` and `enable.idempotence=true` have been default Kafka settings since 3.0.0. In addition, if
 idempotence is enabled, Kafka will automatically require `acks=all` for durable writes.
@@ -260,7 +262,8 @@ sequenceDiagram
 |---|---|---|
 | `acks` | `all` | All in-sync replicas must acknowledge before the send completes |
 | `enable.idempotence` | `true` | Prevents duplicate records from broker-level retries |
-| `retries` | `Integer.MAX_VALUE` | Delegates retry decisions to the application and circuit breaker |
+| `retries` | `Integer.MAX_VALUE` | Retries transient errors until `delivery.timeout.ms` elapses; the time bound, not the count, limits retries |
+| `delivery.timeout.ms` | `120000` (default) | Upper bound on a single send, including all internal retries; not overridden in `KafkaConfig` |
 | `max.in.flight.requests.per.connection` | `5` | Maximum allowed with idempotence enabled |
 
 ### Kafka consumer
