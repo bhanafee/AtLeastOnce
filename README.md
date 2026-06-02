@@ -68,10 +68,11 @@ public void send(Record<String,Foo> record) {
 
 If the first attempt times out (5ms is way too short), the retry will be triggered. But the first attempt might yet
 succeed even after the retry. As before, Kafka would send the same message twice with different sequence numbers.
-You can mitigate this failure by selecting the configuration settings so that Kafka's internal retry loop completes
-its retry attempts before the application layer attempts a retry of its own. Enabling idempotence requires
-`retries` > 0. The critical setting is `delivery.timeout.ms`: it bounds Kafka's internal retry loop, so set it
-larger than the application-layer retry window to let Kafka exhaust its own retries before your code retries.
+You can mitigate this failure by ensuring Kafka's internal retry loop finishes before the application retries.
+Enabling idempotence requires `retries` > 0. The critical setting is `delivery.timeout.ms`, which bounds the
+whole send including internal retries. Keep it *no larger* than the application's per-attempt timeout, or simply
+gate the application retry on the `send()` future completing. Idempotence dedups only Kafka's own retries. A
+fresh application-level `send()` gets a new sequence number and is not filtered.
 
 #### Exception on Send
 
